@@ -1,0 +1,13 @@
+<projectDescription>
+  <name>sarq</name>
+  <comment>EARQ = ElasticSearch + ARQ (Free Text Indexing for SPARQL (via ARQ property functions) using a ElasticSearch (and Lucene))</comment>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

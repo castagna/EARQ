@@ -1,0 +1,8 @@
+PREFIX : <http://example/>
+PREFIX earq: <http://openjena.org/EARQ/property#>
+
+SELECT *
+{
+    ?lit earq:search '+document' . 
+    ?doc ?p ?lit
+}
