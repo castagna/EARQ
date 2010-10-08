@@ -16,18 +16,19 @@
 
 package org.openjena.earq.builders;
 
+import static org.elasticsearch.client.Requests.createIndexRequest;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 
 import org.elasticsearch.ElasticSearchException;
-import org.elasticsearch.client.AdminClient;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.admin.indices.optimize.OptimizeRequestBuilder;
-import org.elasticsearch.client.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.client.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.openjena.earq.Document;
@@ -45,15 +46,51 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 	public ElasticSearchIndexBuilder(String index) { 
     	super() ; 
 
-    	node = NodeBuilder.nodeBuilder().node().start();
+//    	node = NodeBuilder.nodeBuilder().node().start();
+    	
+    	node = NodeBuilder
+		.nodeBuilder()
+		.loadConfigSettings(false)
+		.clusterName("test.earq.cluster")
+		.local(true)
+		.settings(
+				ImmutableSettings.settingsBuilder()
+					.put("gateway.type", "none")
+					.put("index.number_of_shards", 1)
+					.put("index.number_of_replicas", 1).build()
+		).node().start(); 
+    	
     	client = node.client();
     	this.index = index;
+    	
+    	try {
+			createMapping();
+    	} catch (IndexAlreadyExistsException e ) {
+    		e.printStackTrace();
+    		// TODO: add loging
+    		// it's ok
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new EARQException(e.getMessage(), e);
+		}
     }
+	
+	private CreateIndexResponse createMapping() throws IOException {
+		XContentBuilder mapping = jsonBuilder().startObject().startObject("properties")
+        .startObject(EARQ.fText).field("type", "string").field("index", "analyzed").field("store", "no").endObject()
+        .startObject(EARQ.fLex).field("type", "string").field("index", "no").field("store", "yes").endObject()
+        .startObject(EARQ.fDataType).field("type", "string").field("index", "no").field("store", "yes").endObject()
+        .startObject(EARQ.fLang).field("type", "string").field("index", "no").field("store", "yes").endObject()
+        .startObject(EARQ.fBNodeID).field("type", "string").field("index", "no").field("store", "yes").endObject()
+        .startObject(EARQ.fURI).field("type", "string").field("index", "no").field("store", "yes").endObject()
+        .endObject().endObject();
+		return client.admin().indices().create(createIndexRequest(index).mapping(EARQ.DEFAULT_INDEX_TYPE, mapping)).actionGet();
+	}
 
 	@Override
 	public void add(Document doc) {
 		try {
-			IndexRequestBuilder irb = client.prepareIndex(index, "node", doc.get(EARQ.fId));
+			IndexRequestBuilder irb = client.prepareIndex(index, EARQ.DEFAULT_INDEX_TYPE, doc.get(EARQ.fId));
 			XContentBuilder cb = jsonBuilder();
 			cb.startObject();
 			for ( String name : doc.getNames() ) {
@@ -73,7 +110,7 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
 	@Override
 	public void delete(String id) {
-		DeleteRequestBuilder drb = client.prepareDelete(index, "node", id);
+		DeleteRequestBuilder drb = client.prepareDelete(index, EARQ.DEFAULT_INDEX_TYPE, id);
 		drb.setRefresh(true);
 		/* DeleteResponse response = */ drb.execute().actionGet();
 	}
@@ -90,16 +127,16 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 		node.close();
 	}
 
-	private void refresh() {
-		AdminClient ac = client.admin();
-		RefreshRequestBuilder rrb = ac.indices().prepareRefresh(index);
-		rrb.execute();
-	}
-	
-	private void optimize() {
-		AdminClient ac = client.admin();
-		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
-		/* OptimizeResponse response = */ orb.execute();
-	}
+//	private void refresh() {
+//		AdminClient ac = client.admin();
+//		RefreshRequestBuilder rrb = ac.indices().prepareRefresh(index);
+//		rrb.execute();
+//	}
+//	
+//	private void optimize() {
+//		AdminClient ac = client.admin();
+//		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
+//		/* OptimizeResponse response = */ orb.execute();
+//	}
 
 }

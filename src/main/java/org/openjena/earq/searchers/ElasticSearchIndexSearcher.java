@@ -25,6 +25,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -46,7 +47,20 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 	private final String index;
 	
 	public ElasticSearchIndexSearcher(String index) {
-    	node = NodeBuilder.nodeBuilder().node().start();
+//    	node = NodeBuilder.nodeBuilder().node().start();
+		
+    	node = NodeBuilder
+		.nodeBuilder()
+		.loadConfigSettings(false)
+		.clusterName("test.earq.cluster")
+		.local(true)
+		.settings(
+				ImmutableSettings.settingsBuilder()
+					.put("gateway.type", "none")
+					.put("index.number_of_shards", 1)
+					.put("index.number_of_replicas", 1).build()
+		).node().start(); 
+		
     	client = node.client();
     	this.index = index;
 	}

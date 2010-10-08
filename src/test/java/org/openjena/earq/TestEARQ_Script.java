@@ -18,11 +18,6 @@ package org.openjena.earq;
 
 import static org.junit.Assert.assertTrue;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openjena.earq.indexers.ModelIndexer;
 import org.openjena.earq.indexers.ModelIndexerString;
@@ -46,24 +41,25 @@ public class TestEARQ_Script {
     static final String root = "src/test/resources/EARQ/" ;
     static final String location = "test";
     
-    private static Node node = null;
-    
-    @BeforeClass public static void startCluster() {
-    	node = NodeBuilder
-    		.nodeBuilder()
-    		.loadConfigSettings(false)
-    		.clusterName("test.earq.cluster")
-    		.local(true)
-    		.settings(
-   				ImmutableSettings.settingsBuilder()
-   					.put("index.number_of_shards", 1)
-   					.put("index.number_of_replicas", 1).build()
-    		).node().start(); 
-    }
-    
-    @AfterClass public static void stopCluster() {
-    	node.stop();
-    }
+//    private Node node = null;
+//    
+//    @Before public void startCluster() {
+//    	node = NodeBuilder
+//    		.nodeBuilder()
+//    		.loadConfigSettings(false)
+//    		.clusterName("test.earq.cluster")
+//    		.local(true)
+//    		.settings(
+//   				ImmutableSettings.settingsBuilder()
+//   					.put("gateway.type", "none")
+//   					.put("index.number_of_shards", 1)
+//   					.put("index.number_of_replicas", 1).build()
+//    		).node().start(); 
+//    }
+//    
+//    @After public void stopCluster() {
+//    	node.stop();
+//    }
     
     static void runTestScript(String queryFile, String dataFile, String resultsFile, ModelIndexer indexer) {
         Query query = QueryFactory.read(root+queryFile) ;
@@ -71,7 +67,7 @@ public class TestEARQ_Script {
         model.register(indexer) ;
         FileManager.get().readModel(model, root+dataFile) ;
         model.unregister(indexer) ;
-        indexer.close();
+        // indexer.close();
 
         EARQ.setDefaultIndex(indexer.getIndexSearcher()) ;
 

@@ -48,6 +48,7 @@ public class EARQ {
     public static enum Type { LUCENE, SOLR, ELASTICSEARCH };
     
     public static final Type DEFAULT_TYPE = Type.ELASTICSEARCH;
+    public static final String DEFAULT_INDEX_TYPE = "earq"; // this is for ElasticSearch only
     
     static {
     	PropertyFunctionRegistry.get().put(EARQPropertyFunctionLibraryURI + "search", search.class);

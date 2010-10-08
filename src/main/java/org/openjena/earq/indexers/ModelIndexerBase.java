@@ -20,7 +20,6 @@ import org.openjena.earq.EARQ;
 import org.openjena.earq.IndexBuilder;
 import org.openjena.earq.IndexSearcher;
 import org.openjena.earq.builders.IndexBuilderFactory;
-import org.openjena.earq.searchers.IndexSearcherFactory;
 
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -32,8 +31,8 @@ public abstract class ModelIndexerBase extends StatementListener implements Mode
     protected IndexSearcher searcher ;
     
     public ModelIndexerBase(String location) { 
-    	builder = IndexBuilderFactory.create(EARQ.DEFAULT_TYPE, location); 
-    	searcher = IndexSearcherFactory.create(EARQ.DEFAULT_TYPE, location);
+    	builder = IndexBuilderFactory.create(EARQ.DEFAULT_TYPE, location);
+    	searcher = builder.getIndexSearcher();
     }
 
     @Override public abstract void indexStatement(Statement s) ;

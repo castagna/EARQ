@@ -57,7 +57,17 @@ public class ESTest1 extends Assert {
     	refresh(client);
     	SearchHits hits = search(client, "Hello");
     	assertEquals(1, hits.totalHits());
-    	assertEquals(FIELD_VALUE, hits.getHits()[0].getFields().get(FIELD_NAME).value());
+    	
+    	System.out.println(hits.getAt(0));
+    	System.out.println(hits.getHits()[0]);
+    	System.out.println(hits.getHits()[0].getSource());
+    	System.out.println(hits.getHits()[0].getFields());
+    	
+    	System.out.println(hits.getAt(0).getFields());
+    	System.out.println(hits.getAt(0).getFields().get(FIELD_NAME));
+    	System.out.println(hits.getAt(0).getFields().get(FIELD_NAME).value());
+    	
+    	assertEquals(FIELD_VALUE, hits.getAt(0).getFields().get(FIELD_NAME).value());
     }
 
     private void refresh(Client client) {

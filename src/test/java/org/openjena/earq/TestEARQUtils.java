@@ -19,8 +19,6 @@ package org.openjena.earq;
 import java.util.Iterator;
 
 import org.openjena.atlas.lib.StrUtils;
-import org.openjena.earq.indexers.ModelIndexer;
-import org.openjena.earq.searchers.IndexSearcherFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -29,8 +27,6 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.util.iterator.NiceIterator;
 
 public class TestEARQUtils {
@@ -68,17 +64,17 @@ public class TestEARQUtils {
         return count ;
     }
     
-    public static IndexSearcher createIndex(String datafile, ModelIndexer indexer) { 
-    	return createIndex(ModelFactory.createDefaultModel(), datafile, indexer) ; 
-    }
-    
-    public static IndexSearcher createIndex(Model model, String datafile, ModelIndexer indexer) {
-        model.register(indexer) ;
-        FileManager.get().readModel(model, datafile) ;
-        model.unregister(indexer) ;
-        indexer.close() ;
-
-        return IndexSearcherFactory.create(EARQ.DEFAULT_TYPE, "test");
-    }
+//    public static IndexSearcher createIndex(String datafile, ModelIndexer indexer) { 
+//    	return createIndex(ModelFactory.createDefaultModel(), datafile, indexer) ; 
+//    }
+//
+//    public static IndexSearcher createIndex(Model model, String datafile, ModelIndexer indexer) {
+//        model.register(indexer) ;
+//        FileManager.get().readModel(model, datafile) ;
+//        model.unregister(indexer) ;
+//        indexer.close() ;
+//
+//        return indexer.getIndexSearcher();
+//    }
 
 }
