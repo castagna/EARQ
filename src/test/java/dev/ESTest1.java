@@ -61,7 +61,7 @@ public class ESTest1 extends Assert {
 
     private void refresh(Client client) {
     	client.admin().indices().refresh(refreshRequest()).actionGet();
-    	client.admin().cluster().health(waitFor)
+    	client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout("10s").execute().actionGet();
     }
 
     private SearchHits search(Client client, String query) {
