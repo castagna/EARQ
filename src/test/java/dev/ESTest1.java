@@ -1,8 +1,9 @@
 package dev;
 
+import static org.elasticsearch.index.query.xcontent.QueryBuilders.fieldQuery;
+
 import static org.elasticsearch.client.Requests.refreshRequest;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import static org.elasticsearch.index.query.xcontent.QueryBuilders.termQuery;
 
 import java.io.IOException;
 
@@ -56,7 +57,7 @@ public class ESTest1 extends Assert {
     	refresh(client);
     	SearchHits hits = search(client, "Hello");
     	assertEquals(1, hits.totalHits());
-    	assertEquals(FIELD_VALUE, hits.getAt(0).field(FIELD_NAME).getValue().toString());
+    	assertEquals(FIELD_VALUE, hits.getHits()[0].getFields().get(FIELD_NAME).value());
     }
 
     private void refresh(Client client) {
@@ -67,7 +68,7 @@ public class ESTest1 extends Assert {
     private SearchHits search(Client client, String query) {
     	SearchRequestBuilder srb = client.prepareSearch(INDEX_NAME);
     	srb.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-    	srb.setQuery(termQuery(FIELD_NAME, query));
+    	srb.setQuery(fieldQuery(FIELD_NAME, query));
     	srb.setFrom(0);
     	srb.setSize(10);
     	srb.setExplain(false);
