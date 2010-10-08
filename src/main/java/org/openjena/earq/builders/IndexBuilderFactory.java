@@ -2,10 +2,11 @@ package org.openjena.earq.builders;
 
 import org.openjena.earq.EARQ;
 import org.openjena.earq.EARQException;
+import org.openjena.earq.IndexBuilder;
 
 public class IndexBuilderFactory {
 
-	public static IndexBuilderBase create(EARQ.Type type, String location) {
+	public static IndexBuilder create(EARQ.Type type, String location) {
 		switch (type) {
 		case LUCENE:
 			return new LuceneIndexBuilder(location);

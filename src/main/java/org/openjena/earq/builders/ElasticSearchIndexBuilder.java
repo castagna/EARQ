@@ -24,6 +24,7 @@ import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.admin.indices.optimize.OptimizeRequestBuilder;
+import org.elasticsearch.client.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.client.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -32,6 +33,8 @@ import org.elasticsearch.node.NodeBuilder;
 import org.openjena.earq.Document;
 import org.openjena.earq.EARQ;
 import org.openjena.earq.EARQException;
+import org.openjena.earq.IndexSearcher;
+import org.openjena.earq.searchers.ElasticSearchIndexSearcher;
 
 public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
@@ -42,7 +45,7 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 	public ElasticSearchIndexBuilder(String index) { 
     	super() ; 
 
-    	node = NodeBuilder.nodeBuilder().node();
+    	node = NodeBuilder.nodeBuilder().node().start();
     	client = node.client();
     	this.index = index;
     }
@@ -76,11 +79,23 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 	}
 
 	@Override
-	public void close() {
-		optimize();
-		node.close();
+	public IndexSearcher getIndexSearcher() {
+		return new ElasticSearchIndexSearcher(node, index);
 	}
 
+	@Override
+	public void close() {
+		optimize();
+		refresh();
+		// node.close();
+	}
+
+	private void refresh() {
+		AdminClient ac = client.admin();
+		RefreshRequestBuilder rrb = ac.indices().prepareRefresh(index);
+		rrb.execute();
+	}
+	
 	private void optimize() {
 		AdminClient ac = client.admin();
 		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);

@@ -1,6 +1,7 @@
 package org.openjena.earq.builders;
 
 import org.openjena.earq.Document;
+import org.openjena.earq.IndexSearcher;
 
 public class SolrIndexBuilder extends IndexBuilderBase {
 
@@ -18,6 +19,12 @@ public class SolrIndexBuilder extends IndexBuilderBase {
 	public void delete(String id) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public IndexSearcher getIndexSearcher() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

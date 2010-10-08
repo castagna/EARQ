@@ -25,6 +25,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
+import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
@@ -45,10 +46,17 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 	private final String index;
 	
 	public ElasticSearchIndexSearcher(String index) {
-    	node = NodeBuilder.nodeBuilder().node();
+    	node = NodeBuilder.nodeBuilder().node().start();
     	client = node.client();
     	this.index = index;
 	}
+
+	public ElasticSearchIndexSearcher(Node node, String index) {
+		this.node = node;
+		client = node.client();
+		this.index = index;
+	}
+
 	
 	@Override
     public Iterator<Document> search(String query) {

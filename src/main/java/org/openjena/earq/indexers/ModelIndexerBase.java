@@ -17,8 +17,10 @@
 package org.openjena.earq.indexers;
 
 import org.openjena.earq.EARQ;
-import org.openjena.earq.builders.IndexBuilderBase;
+import org.openjena.earq.IndexBuilder;
+import org.openjena.earq.IndexSearcher;
 import org.openjena.earq.builders.IndexBuilderFactory;
+import org.openjena.earq.searchers.IndexSearcherFactory;
 
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -26,10 +28,12 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public abstract class ModelIndexerBase extends StatementListener implements ModelIndexer {
 
-    protected IndexBuilderBase builder ;
+    protected IndexBuilder builder ;
+    protected IndexSearcher searcher ;
     
     public ModelIndexerBase(String location) { 
-    	builder = IndexBuilderFactory.create(EARQ.DEFAULT_TYPE, location) ; 
+    	builder = IndexBuilderFactory.create(EARQ.DEFAULT_TYPE, location); 
+    	searcher = IndexSearcherFactory.create(EARQ.DEFAULT_TYPE, location);
     }
 
     @Override public abstract void indexStatement(Statement s) ;
@@ -57,6 +61,11 @@ public abstract class ModelIndexerBase extends StatementListener implements Mode
         for ( ; sIter.hasNext() ; ) {
             unindexStatement(sIter.nextStatement()) ;
         }
+    }
+    
+    @Override
+    public IndexSearcher getIndexSearcher() {
+    	return searcher;
     }
     
     @Override

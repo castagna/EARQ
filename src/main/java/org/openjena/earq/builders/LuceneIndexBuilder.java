@@ -1,6 +1,7 @@
 package org.openjena.earq.builders;
 
 import org.openjena.earq.Document;
+import org.openjena.earq.IndexSearcher;
 
 public class LuceneIndexBuilder extends IndexBuilderBase {
 
@@ -20,6 +21,12 @@ public class LuceneIndexBuilder extends IndexBuilderBase {
 		
 	}
 
+	@Override
+	public IndexSearcher getIndexSearcher() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub

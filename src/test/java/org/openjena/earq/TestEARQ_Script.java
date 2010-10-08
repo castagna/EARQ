@@ -18,6 +18,7 @@ package org.openjena.earq;
 
 import static org.junit.Assert.assertTrue;
 
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.junit.AfterClass;
@@ -26,7 +27,6 @@ import org.junit.Test;
 import org.openjena.earq.indexers.ModelIndexer;
 import org.openjena.earq.indexers.ModelIndexerString;
 import org.openjena.earq.indexers.ModelIndexerSubject;
-import org.openjena.earq.searchers.IndexSearcherFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -49,8 +49,16 @@ public class TestEARQ_Script {
     private static Node node = null;
     
     @BeforeClass public static void startCluster() {
-    	node = NodeBuilder.nodeBuilder().node();
-    	node.start();
+    	node = NodeBuilder
+    		.nodeBuilder()
+    		.loadConfigSettings(false)
+    		.clusterName("test.earq.cluster")
+    		.local(true)
+    		.settings(
+   				ImmutableSettings.settingsBuilder()
+   					.put("index.number_of_shards", 1)
+   					.put("index.number_of_replicas", 1).build()
+    		).node().start(); 
     }
     
     @AfterClass public static void stopCluster() {
@@ -65,8 +73,7 @@ public class TestEARQ_Script {
         model.unregister(indexer) ;
         indexer.close();
 
-        IndexSearcher searcher = IndexSearcherFactory.create(EARQ.DEFAULT_TYPE, location) ;
-        EARQ.setDefaultIndex(searcher) ;
+        EARQ.setDefaultIndex(indexer.getIndexSearcher()) ;
 
         QueryExecution qe = QueryExecutionFactory.create(query, model) ;
         ResultSetRewindable rsExpected = ResultSetFactory.makeRewindable(ResultSetFactory.load(root+resultsFile)) ;

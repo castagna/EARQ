@@ -16,10 +16,27 @@
 
 package org.openjena.earq;
 
+import java.io.Reader;
+
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+
 public interface IndexBuilder {
 
 	public void add(Document doc);
 	public void delete(String id);
-    public void close();
 
+	public IndexSearcher getIndexSearcher();
+
+	public void close();
+
+	public void index(RDFNode rdfNode, String indexStr);
+	public void index(RDFNode rdfNode, Reader indexStream);
+	public void index(Node node, String indexStr);
+	public void index(Node node, Reader indexStream);
+	public void unindex(RDFNode node, Reader indexStream);
+	public void unindex(RDFNode node, String indexStr);
+	public void unindex(Node node, Reader indexStream);
+	public void unindex(Node node, String indexStr);
+	
 }

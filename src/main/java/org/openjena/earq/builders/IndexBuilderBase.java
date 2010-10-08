@@ -28,11 +28,12 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public abstract class IndexBuilderBase implements IndexBuilder {
 
-    @Override public abstract void close();
-
 	@Override public abstract void add(Document doc);
 	@Override public abstract void delete(String id);
 
+    @Override public abstract void close();
+
+	@Override
 	public void index(RDFNode rdfNode, String indexStr) {
 		Document doc = new Document() ;
 	    EARQ.store(doc, rdfNode.asNode()) ;
@@ -40,6 +41,7 @@ public abstract class IndexBuilderBase implements IndexBuilder {
 	    add(doc) ;
 	}
 
+	@Override
 	public void index(RDFNode rdfNode, Reader indexStream) {
 		Document doc = new Document() ;
 		EARQ.store(doc, rdfNode.asNode()) ;
@@ -47,6 +49,7 @@ public abstract class IndexBuilderBase implements IndexBuilder {
 	    add(doc) ;
 	}
 
+	@Override
 	public void index(Node node, String indexStr) {
 		Document doc = new Document() ;
 	    EARQ.store(doc, node) ;
@@ -54,6 +57,7 @@ public abstract class IndexBuilderBase implements IndexBuilder {
 	    add(doc) ;
 	}
 
+	@Override
 	public void index(Node node, Reader indexStream) {
 		Document doc = new Document() ;
 	    EARQ.store(doc, node) ;
@@ -61,10 +65,12 @@ public abstract class IndexBuilderBase implements IndexBuilder {
 	    add(doc) ;
 	}
 
+	@Override
 	public void unindex(RDFNode node, Reader indexStream) {
 		unindex(node.asNode(), indexStream);
 	}
 
+	@Override
 	public void unindex(RDFNode node, String indexStr) {
 		unindex(node.asNode(), indexStr);
 	}
@@ -78,6 +84,7 @@ public abstract class IndexBuilderBase implements IndexBuilder {
 	    } 
 	}
 
+	@Override
 	public void unindex(Node node, String indexStr) {
 		try {
 			String id = EARQ.unindex(node, indexStr);
