@@ -16,7 +16,7 @@
 
 package org.openjena.earq.searchers;
 
-import static org.elasticsearch.index.query.xcontent.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.xcontent.QueryBuilders.fieldQuery;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
     public Iterator<Document> search(String query) {
     	SearchRequestBuilder srb = client.prepareSearch(index);
     	srb.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-    	srb.setQuery(termQuery(EARQ.fText, query));
+    	srb.setQuery(fieldQuery(EARQ.fText, query));
     	srb.setFrom(0);
     	srb.setSize(NUM_RESULTS);
     	srb.setExplain(false);

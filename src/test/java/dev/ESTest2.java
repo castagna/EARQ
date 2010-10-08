@@ -66,6 +66,7 @@ public class ESTest2 extends Assert {
 NodeBuilder.nodeBuilder().loadConfigSettings(false).clusterName("test.cluster").local(true).settings(
 
                 ImmutableSettings.settingsBuilder()
+                .put("gateway.type", "none")
                 .put("index.number_of_shards", 1)
                 .put("index.number_of_replicas", 1).build()
 

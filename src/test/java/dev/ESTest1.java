@@ -37,6 +37,7 @@ public class ESTest1 extends Assert {
     		.clusterName("mycluster")
     		.local(true)
     		.settings(ImmutableSettings.settingsBuilder()
+                .put("gateway.type", "none")
     			.put("index.number_of_shards", 1)
     			.put("index.number_of_replicas", 1).build()
     		).node().start();
@@ -60,6 +61,7 @@ public class ESTest1 extends Assert {
 
     private void refresh(Client client) {
     	client.admin().indices().refresh(refreshRequest()).actionGet();
+    	client.admin().cluster().health(waitFor)
     }
 
     private SearchHits search(Client client, String query) {

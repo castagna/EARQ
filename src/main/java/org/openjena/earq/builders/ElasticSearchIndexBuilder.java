@@ -85,9 +85,9 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
 	@Override
 	public void close() {
-		optimize();
-		refresh();
-		// node.close();
+//		optimize();
+//		refresh();
+		node.close();
 	}
 
 	private void refresh() {
