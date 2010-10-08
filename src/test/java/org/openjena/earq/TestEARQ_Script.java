@@ -18,6 +18,10 @@ package org.openjena.earq;
 
 import static org.junit.Assert.assertTrue;
 
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openjena.earq.indexers.ModelIndexer;
 import org.openjena.earq.indexers.ModelIndexerString;
@@ -41,6 +45,17 @@ public class TestEARQ_Script {
 
     static final String root = "src/test/resources/EARQ/" ;
     static final String location = "test";
+    
+    private static Node node = null;
+    
+    @BeforeClass public static void startCluster() {
+    	node = NodeBuilder.nodeBuilder().node();
+    	node.start();
+    }
+    
+    @AfterClass public static void stopCluster() {
+    	node.stop();
+    }
     
     static void runTestScript(String queryFile, String dataFile, String resultsFile, ModelIndexer indexer) {
         Query query = QueryFactory.read(root+queryFile) ;

@@ -21,7 +21,9 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import java.io.IOException;
 
 import org.elasticsearch.ElasticSearchException;
+import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.action.admin.indices.optimize.OptimizeRequestBuilder;
 import org.elasticsearch.client.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -73,16 +75,16 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 		/* DeleteResponse response = */ drb.execute().actionGet();
 	}
 
-//	@Override
-//	public void optimize() {
-//		AdminClient ac = client.admin();
-//		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(EARQ.DEFAULT_INDEX_NAME);
-//		/* OptimizeResponse response = */ orb.execute();
-//	}
-
 	@Override
 	public void close() {
+		optimize();
 		node.close();
+	}
+
+	private void optimize() {
+		AdminClient ac = client.admin();
+		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
+		/* OptimizeResponse response = */ orb.execute();
 	}
 
 }
