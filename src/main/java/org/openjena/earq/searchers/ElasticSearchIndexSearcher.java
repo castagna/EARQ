@@ -29,7 +29,6 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
 import org.openjena.earq.Document;
 import org.openjena.earq.EARQ;
@@ -75,8 +74,13 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 	@Override
     public Iterator<Document> search(String query) {
     	SearchRequestBuilder srb = client.prepareSearch(index);
-    	srb.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+    	srb.setSearchType(SearchType.QUERY_AND_FETCH);
     	srb.setQuery(fieldQuery(EARQ.fText, query));
+//    	srb.addField(EARQ.fURI);
+//    	srb.addField(EARQ.fBNodeID);
+//    	srb.addField(EARQ.fLex);
+//    	srb.addField(EARQ.fDataType);
+//    	srb.addField(EARQ.fLang);
     	srb.setFrom(0);
     	srb.setSize(NUM_RESULTS);
     	srb.setExplain(false);
@@ -89,10 +93,16 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 		@Override
 		public Document map1(SearchHit hit) {
 			Document doc = new Document();
-			Map<String, SearchHitField> fields = hit.getFields();
-			for (String name : fields.keySet()) {
-				doc.set(name, fields.get(name).getValue().toString());
+			doc.set(EARQ.fId, hit.getId());
+			doc.set(EARQ.fScore, String.valueOf(hit.score()));
+			Map<String, Object> source = hit.getSource();
+			for (String name : source.keySet()) {
+				doc.set(name, source.get(name).toString());
 			}
+//			Map<String, SearchHitField> fields = hit.getFields();
+//			for (String name : fields.keySet()) {
+//				doc.set(name, fields.get(name).getValue().toString());
+//			}
 			return doc;
 		}
 	}

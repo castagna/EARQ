@@ -210,7 +210,7 @@ public abstract class SearchPropertyFunctionEval extends PropertyFunctionEval {
         if ( score == null ) { 
             return QueryIterSingleton.create(binding, execCxt) ;
         }
-        return IterLib.oneResult(binding, score, NodeFactory.floatToNode(Float.parseFloat(doc.get("score"))), execCxt) ;
+        return IterLib.oneResult(binding, score, NodeFactory.floatToNode(Float.parseFloat(doc.get(EARQ.fScore))), execCxt) ;
     }
 
     static private String asString(Node node) {

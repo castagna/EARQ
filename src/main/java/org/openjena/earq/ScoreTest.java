@@ -28,7 +28,7 @@ class ScoreTest implements IteratorTruncate.Test {
 
     public boolean accept(Object object) {
     	Document doc = (Document)object;
-        return ( Float.parseFloat(doc.get("score")) >= scoreLimit );
+        return ( Float.parseFloat(doc.get(EARQ.fScore)) >= scoreLimit );
     }
 
 }

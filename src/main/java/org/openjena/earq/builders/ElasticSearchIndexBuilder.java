@@ -17,18 +17,21 @@
 package org.openjena.earq.builders;
 
 import static org.elasticsearch.client.Requests.createIndexRequest;
+import static org.elasticsearch.client.Requests.refreshRequest;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.action.admin.indices.optimize.OptimizeRequestBuilder;
+import org.elasticsearch.client.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.client.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.openjena.earq.Document;
@@ -65,13 +68,9 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
     	
     	try {
 			createMapping();
-    	} catch (IndexAlreadyExistsException e ) {
+    	} catch (Exception e ) {
     		e.printStackTrace();
     		// TODO: add loging
-    		// it's ok
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new EARQException(e.getMessage(), e);
 		}
     }
 	
@@ -117,26 +116,28 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
 	@Override
 	public IndexSearcher getIndexSearcher() {
+    	client.admin().indices().refresh(refreshRequest()).actionGet();
+    	client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout("10s").execute().actionGet();
+
+		
 		return new ElasticSearchIndexSearcher(node, index);
 	}
 
 	@Override
 	public void close() {
 //		optimize();
-//		refresh();
-		node.close();
+		refresh();
+//		node.close();
 	}
 
-//	private void refresh() {
-//		AdminClient ac = client.admin();
-//		RefreshRequestBuilder rrb = ac.indices().prepareRefresh(index);
-//		rrb.execute();
-//	}
-//	
-//	private void optimize() {
-//		AdminClient ac = client.admin();
-//		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
-//		/* OptimizeResponse response = */ orb.execute();
-//	}
+	private void refresh() {
+		client.admin().indices().prepareRefresh(index).execute().actionGet();
+	}
+	
+	private void optimize() {
+		AdminClient ac = client.admin();
+		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
+		/* OptimizeResponse response = */ orb.execute();
+	}
 
 }

@@ -38,7 +38,7 @@ class DocumentConverter implements Map1<Document,Binding> {
         Binding b = new BindingMap(binding) ;
         b.add(Var.alloc(subject), EARQ.build(doc)) ;
         if ( score != null ) {
-            b.add(Var.alloc(score), NodeFactory.floatToNode(Float.parseFloat(doc.get("score")))) ;
+            b.add(Var.alloc(score), NodeFactory.floatToNode(Float.parseFloat(doc.get(EARQ.fScore)))) ;
         }
         return b ;
     }

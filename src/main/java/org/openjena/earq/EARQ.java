@@ -56,6 +56,8 @@ public class EARQ {
 
     public static final String fId                 = "id" ;
 
+    public static final String fScore              = "score" ;
+    
     // The field that is the index
     public static final String fText               = "text" ;
 
@@ -134,15 +136,15 @@ public class EARQ {
     }
 
     public static Node build(Document doc) {
-        String lex = (String)doc.get(EARQ.fLex) ;
+        String lex = doc.get(EARQ.fLex) ;
         if ( lex != null ) {
             return buildLiteral(doc) ;
         }
-        String uri = (String)doc.get(EARQ.fURI) ;
+        String uri = doc.get(EARQ.fURI) ;
         if ( uri != null ) {
             return Node.createURI(uri) ;
         }
-        String bnode = (String)doc.get(EARQ.fBNodeID) ;
+        String bnode = doc.get(EARQ.fBNodeID) ;
         if ( bnode != null ) {
             return Node.createAnon(new AnonId(bnode)) ;
         }
@@ -162,13 +164,13 @@ public class EARQ {
     
     private static void storeURI(Document doc, Node_URI node) { 
         String x = node.getURI() ;
-        doc.set(EARQ.fText, x) ;
+        // doc.set(EARQ.fText, x) ;
         doc.set(EARQ.fURI, x) ;
     }
 
     private static void storeBNode(Document doc, Node_Blank node) { 
         String x = node.getBlankNodeLabel() ;
-        doc.set(EARQ.fText, x) ;
+        // doc.set(EARQ.fText, x) ;
         doc.set(EARQ.fBNodeID, x) ;
     }
     
