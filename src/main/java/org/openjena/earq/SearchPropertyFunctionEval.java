@@ -191,7 +191,7 @@ public abstract class SearchPropertyFunctionEval extends PropertyFunctionEval {
             iter = new IteratorTruncate<Document>(new ScoreTest(scoreLimit), iter) ;
         }
         
-        DocumentConverter converter = new DocumentConverter(binding, match, score) ;
+        Document2BindingConverter converter = new Document2BindingConverter(binding, match, score) ;
         Iterator<Binding> iter2 = new Map1Iterator<Document, Binding>(converter, iter) ;
         QueryIterator qIter = new QueryIterPlainWrapper(iter2, execCxt) ;
 

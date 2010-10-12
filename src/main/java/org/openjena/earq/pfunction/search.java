@@ -23,7 +23,8 @@ import org.openjena.earq.SearchPropertyFunctionEval;
 import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 
 public class search extends SearchPropertyFunctionEval {
-    private IndexSearcher index = null ;
+
+	private IndexSearcher index = null ;
 
     @Override
     protected IndexSearcher getIndexSearcher(ExecutionContext execCxt) { 

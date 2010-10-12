@@ -17,17 +17,13 @@
 package org.openjena.earq.builders;
 
 import static org.elasticsearch.client.Requests.createIndexRequest;
-import static org.elasticsearch.client.Requests.refreshRequest;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.admin.indices.optimize.OptimizeRequestBuilder;
-import org.elasticsearch.client.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.client.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -37,35 +33,35 @@ import org.elasticsearch.node.NodeBuilder;
 import org.openjena.earq.Document;
 import org.openjena.earq.EARQ;
 import org.openjena.earq.EARQException;
+import org.openjena.earq.ElasticSearchConstants;
 import org.openjena.earq.IndexSearcher;
-import org.openjena.earq.searchers.ElasticSearchIndexSearcher;
+import org.openjena.earq.searchers.IndexSearcherFactory;
 
 public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
-	private Node node = null;
-	private Client client = null;
+	private Node node;
+	private Client client;
 	private final String index;
 	
 	public ElasticSearchIndexBuilder(String index) { 
     	super() ; 
 
-//    	node = NodeBuilder.nodeBuilder().node().start();
-    	
-    	node = NodeBuilder
-		.nodeBuilder()
-		.loadConfigSettings(false)
-		.clusterName("test.earq.cluster")
-		.local(true)
-		.settings(
-				ImmutableSettings.settingsBuilder()
-					.put("gateway.type", "none")
-					.put("index.number_of_shards", 1)
-					.put("index.number_of_replicas", 1).build()
-		).node().start(); 
-    	
-    	client = node.client();
+    	node = NodeBuilder.nodeBuilder()
+    		.client(true)
+    		.loadConfigSettings(false)
+    		.clusterName(ElasticSearchConstants.CLUSTER_NAME)
+    		.local(ElasticSearchConstants.LOCAL)
+    		.settings(
+    			ImmutableSettings.settingsBuilder()
+        			.put("network.host", "127.0.0.1")
+//    				.put("index.store.type", "memory")
+    				.put("gateway.type", "none")
+    				.put("index.number_of_shards", 1)
+    				.put("index.number_of_replicas", 1).build()
+    		).node().start();
+        this.client = node.client();
     	this.index = index;
-    	
+
     	try {
 			createMapping();
     	} catch (Exception e ) {
@@ -74,6 +70,14 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 		}
     }
 	
+	public Client getClient() {
+		return client;
+	}
+	
+	public String getIndexName() {
+		return index;
+	}
+
 	private CreateIndexResponse createMapping() throws IOException {
 		XContentBuilder mapping = jsonBuilder().startObject().startObject("properties")
         .startObject(EARQ.fText).field("type", "string").field("index", "analyzed").field("store", "no").endObject()
@@ -83,13 +87,13 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
         .startObject(EARQ.fBNodeID).field("type", "string").field("index", "no").field("store", "yes").endObject()
         .startObject(EARQ.fURI).field("type", "string").field("index", "no").field("store", "yes").endObject()
         .endObject().endObject();
-		return client.admin().indices().create(createIndexRequest(index).mapping(EARQ.DEFAULT_INDEX_TYPE, mapping)).actionGet();
+		return client.admin().indices().create(createIndexRequest(index).mapping(ElasticSearchConstants.INDEX_TYPE, mapping)).actionGet();
 	}
 
 	@Override
 	public void add(Document doc) {
 		try {
-			IndexRequestBuilder irb = client.prepareIndex(index, EARQ.DEFAULT_INDEX_TYPE, doc.get(EARQ.fId));
+			IndexRequestBuilder irb = client.prepareIndex(index, ElasticSearchConstants.INDEX_TYPE, doc.get(EARQ.fId));
 			XContentBuilder cb = jsonBuilder();
 			cb.startObject();
 			for ( String name : doc.getNames() ) {
@@ -109,23 +113,20 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 
 	@Override
 	public void delete(String id) {
-		DeleteRequestBuilder drb = client.prepareDelete(index, EARQ.DEFAULT_INDEX_TYPE, id);
+		DeleteRequestBuilder drb = client.prepareDelete(index, ElasticSearchConstants.INDEX_TYPE, id);
 		drb.setRefresh(true);
 		/* DeleteResponse response = */ drb.execute().actionGet();
 	}
 
 	@Override
 	public IndexSearcher getIndexSearcher() {
-    	client.admin().indices().refresh(refreshRequest()).actionGet();
-    	client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout("10s").execute().actionGet();
-
-		
-		return new ElasticSearchIndexSearcher(node, index);
+		return IndexSearcherFactory.create(this);
 	}
 
 	@Override
 	public void close() {
 //		optimize();
+		// TODO: why if I do not call refresh() and I call node.close() all my tests fail?
 		refresh();
 //		node.close();
 	}
@@ -133,11 +134,11 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
 	private void refresh() {
 		client.admin().indices().prepareRefresh(index).execute().actionGet();
 	}
-	
-	private void optimize() {
-		AdminClient ac = client.admin();
-		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
-		/* OptimizeResponse response = */ orb.execute();
-	}
+//	
+//	private void optimize() {
+//		AdminClient ac = client.admin();
+//		OptimizeRequestBuilder orb = ac.indices().prepareOptimize(index);
+//		/* OptimizeResponse response = */ orb.execute();
+//	}
 
 }

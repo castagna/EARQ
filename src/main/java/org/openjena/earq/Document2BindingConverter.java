@@ -22,13 +22,13 @@ import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
 import com.hp.hpl.jena.sparql.util.NodeFactory;
 import com.hp.hpl.jena.util.iterator.Map1;
 
-class DocumentConverter implements Map1<Document,Binding> {
+class Document2BindingConverter implements Map1<Document,Binding> {
 
 	private Binding binding ;
     private Var subject ;
     private Var score ;
     
-    DocumentConverter(Binding binding, Var subject, Var score) {
+    Document2BindingConverter(Binding binding, Var subject, Var score) {
         this.binding = binding ;
         this.subject = subject ;
         this.score = score ;

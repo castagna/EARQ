@@ -32,6 +32,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.openjena.earq.Document;
 import org.openjena.earq.EARQ;
+import org.openjena.earq.ElasticSearchConstants;
 import org.openjena.earq.IndexSearcher;
 
 import com.hp.hpl.jena.util.iterator.Map1;
@@ -41,35 +42,31 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 	
 	public final static int NUM_RESULTS = 10000;
 	
-	private org.elasticsearch.node.Node node = null;
 	private Client client = null;
 	private final String index;
 	
 	public ElasticSearchIndexSearcher(String index) {
-//    	node = NodeBuilder.nodeBuilder().node().start();
-		
-    	node = NodeBuilder
-		.nodeBuilder()
-		.loadConfigSettings(false)
-		.clusterName("test.earq.cluster")
-		.local(true)
-		.settings(
+    	Node node = NodeBuilder.nodeBuilder()
+			.client(true)
+			.loadConfigSettings(false)
+			.clusterName(ElasticSearchConstants.CLUSTER_NAME)
+			.local(ElasticSearchConstants.LOCAL)
+			.settings(
 				ImmutableSettings.settingsBuilder()
+    				.put("network.host", "127.0.0.1")
+//					.put("index.store.type", "memory")
 					.put("gateway.type", "none")
 					.put("index.number_of_shards", 1)
 					.put("index.number_of_replicas", 1).build()
-		).node().start(); 
-		
-    	client = node.client();
+			).node().start();
+    	this.client = node.client();
     	this.index = index;
 	}
 
-	public ElasticSearchIndexSearcher(Node node, String index) {
-		this.node = node;
-		client = node.client();
+	public ElasticSearchIndexSearcher(Client client, String index) {
+		this.client = client;
 		this.index = index;
 	}
-
 	
 	@Override
     public Iterator<Document> search(String query) {

@@ -23,7 +23,9 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openjena.earq.indexers.ModelIndexer;
 import org.openjena.earq.indexers.ModelIndexerString;
@@ -47,27 +49,32 @@ public class TestEARQ_Script {
     static final String root = "src/test/resources/EARQ/" ;
     static final String location = "test";
     
-    private Node node = null;
+    private static Node node = null;
+    private Client client = null;
     
-    @Before public void startCluster() {
-    	node = NodeBuilder
-    		.nodeBuilder()
-    		.loadConfigSettings(false)
-    		.clusterName("test.earq.cluster")
-    		.local(true)
-    		.settings(
-   				ImmutableSettings.settingsBuilder()
-   					.put("gateway.type", "none")
-   					.put("index.number_of_shards", 1)
-   					.put("index.number_of_replicas", 1).build()
-    		).node().start(); 
+    @BeforeClass public static void startCluster() {
+    	node = NodeBuilder.nodeBuilder().loadConfigSettings(false).clusterName(ElasticSearchConstants.CLUSTER_NAME).local(ElasticSearchConstants.LOCAL).settings(
+				ImmutableSettings.settingsBuilder()
+					.put("network.host", "127.0.0.1")
+//					.put("index.store.type", "memory")
+					.put("gateway.type", "none")
+					.put("index.number_of_shards", 1)
+					.put("index.number_of_replicas", 1).build()
+		).node().start();
     }
     
-    @After public void stopCluster() {
-    	Client client = node.client();
-    	client.prepareDeleteByQuery(location).setQuery("").setTypes(EARQ.DEFAULT_INDEX_TYPE).execute().actionGet();
+    @Before public void setUp() throws InterruptedException {
+    	client = node.client();
+    }
+    
+    @After public void tearDown() {
+    	client.prepareDeleteByQuery(location).setQuery("").setTypes(ElasticSearchConstants.INDEX_TYPE).execute().actionGet();
     	client.admin().indices().prepareDelete(location).execute().actionGet();
     	client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout("10s").execute().actionGet();
+    	client = null;
+    }
+    
+    @AfterClass public static void stopCluster() {
     	node.stop();
     }
     

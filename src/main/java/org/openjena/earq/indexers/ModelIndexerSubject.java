@@ -30,8 +30,7 @@ public class ModelIndexerSubject extends ModelIndexerBase {
     	super(url) ; 
     }
 
-    public ModelIndexerSubject(Property p, String url)
-    {
+    public ModelIndexerSubject(Property p, String url) {
         this(url) ;
         property = p ;
     }
@@ -69,6 +68,7 @@ public class ModelIndexerSubject extends ModelIndexerBase {
             
             Node object  = s.getObject().asNode() ;
             
+            // TODO: double check this!
             // Note: if a subject occurs twice with an indexable string, there will be two hits later.
             builder.index(subject, object.getLiteralLexicalForm()) ;
         } catch (Exception e) { 
