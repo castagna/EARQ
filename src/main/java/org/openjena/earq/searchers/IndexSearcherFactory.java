@@ -28,8 +28,8 @@ public class IndexSearcherFactory {
 			ElasticSearchIndexBuilder esib = (ElasticSearchIndexBuilder)builder;
 			return new ElasticSearchIndexSearcher(esib.getClient(), esib.getIndexName());
 		} else if ( builder instanceof LuceneIndexBuilder ) {
-			// TODO
-			// LuceneIndexBuilder lib = (LuceneIndexBuilder)builder;
+			LuceneIndexBuilder lib = (LuceneIndexBuilder)builder;
+			return new LuceneIndexSearcher(lib.getDirectory());
 		} else if ( builder instanceof SolrIndexBuilder ) {
 			// TODO
 			// SolrIndexBuilder sib = (SolrIndexBuilder)builder;

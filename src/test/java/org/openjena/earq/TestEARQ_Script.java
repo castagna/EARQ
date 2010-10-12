@@ -18,14 +18,6 @@ package org.openjena.earq;
 
 import static org.junit.Assert.assertTrue;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openjena.earq.indexers.ModelIndexer;
 import org.openjena.earq.indexers.ModelIndexerString;
@@ -44,40 +36,11 @@ import com.hp.hpl.jena.sparql.resultset.ResultSetRewindable;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
 
-public class TestEARQ_Script {
+public abstract class TestEARQ_Script {
 
     static final String root = "src/test/resources/EARQ/" ;
-    static final String location = "test";
-    
-    private static Node node = null;
-    private Client client = null;
-    
-    @BeforeClass public static void startCluster() {
-    	node = NodeBuilder.nodeBuilder().loadConfigSettings(false).clusterName(ElasticSearchConstants.CLUSTER_NAME).local(ElasticSearchConstants.LOCAL).settings(
-				ImmutableSettings.settingsBuilder()
-//					.put("network.host", "127.0.0.1")
-//					.put("index.store.type", "memory")
-					.put("gateway.type", "none")
-					.put("index.number_of_shards", 1)
-					.put("index.number_of_replicas", 1).build()
-		).node().start();
-    }
-    
-    @Before public void setUp() throws InterruptedException {
-    	client = node.client();
-    }
-    
-    @After public void tearDown() {
-    	client.prepareDeleteByQuery(location).setQuery("").setTypes(ElasticSearchConstants.INDEX_TYPE).execute().actionGet();
-    	client.admin().indices().prepareDelete(location).execute().actionGet();
-    	client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout("10s").execute().actionGet();
-    	client = null;
-    }
-    
-    @AfterClass public static void stopCluster() {
-    	node.stop();
-    }
-    
+    protected static String location;
+
     static void runTestScript(String queryFile, String dataFile, String resultsFile, ModelIndexer indexer) {
         Query query = QueryFactory.read(root+queryFile) ;
         Model model = ModelFactory.createDefaultModel() ; 
@@ -86,7 +49,8 @@ public class TestEARQ_Script {
         model.unregister(indexer) ;
         indexer.close();
 
-        EARQ.setDefaultIndex(indexer.getIndexSearcher()) ;
+        // EARQ.setDefaultIndex(IndexSearcherFactory.create(EARQ.TYPE, location)) ;
+        EARQ.setDefaultIndex(indexer.getIndexSearcher());
 
         QueryExecution qe = QueryExecutionFactory.create(query, model) ;
         ResultSetRewindable rsExpected = ResultSetFactory.makeRewindable(ResultSetFactory.load(root+resultsFile)) ;

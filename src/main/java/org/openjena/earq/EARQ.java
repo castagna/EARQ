@@ -47,7 +47,7 @@ public class EARQ {
     
     public static enum Type { LUCENE, SOLR, ELASTICSEARCH };
     
-    public static final Type DEFAULT_TYPE = Type.ELASTICSEARCH;
+    public static Type TYPE = Type.ELASTICSEARCH;
     
     static {
     	PropertyFunctionRegistry.get().put(EARQPropertyFunctionLibraryURI + "search", search.class);
@@ -70,7 +70,7 @@ public class EARQ {
     public static final String fBNodeID             = "bnode" ;
 
     // The symbol used to register the index in the query context
-    public static final Symbol indexKey     = ARQConstants.allocSymbol(DEFAULT_TYPE.toString()) ;
+    public static final Symbol indexKey     = ARQConstants.allocSymbol(TYPE.toString()) ;
 
     public static void setDefaultIndex(IndexSearcher index) { 
     	setDefaultIndex(ARQ.getContext(), index) ; 
@@ -163,12 +163,14 @@ public class EARQ {
     
     private static void storeURI(Document doc, Node_URI node) { 
         String x = node.getURI() ;
+        // TODO check this
         // doc.set(EARQ.fText, x) ;
         doc.set(EARQ.fURI, x) ;
     }
 
     private static void storeBNode(Document doc, Node_Blank node) { 
         String x = node.getBlankNodeLabel() ;
+        // TODO check this
         // doc.set(EARQ.fText, x) ;
         doc.set(EARQ.fBNodeID, x) ;
     }

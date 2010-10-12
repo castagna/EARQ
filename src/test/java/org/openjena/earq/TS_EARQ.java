@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses( {
-    TestEARQ_Script.class
+    TestEARQ_Script_Lucene.class,
+    TestEARQ_Script_ElasticSearch.class
 } )
 
 public class TS_EARQ {}

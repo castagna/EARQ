@@ -40,8 +40,6 @@ import com.hp.hpl.jena.util.iterator.Map1Iterator;
 
 public class ElasticSearchIndexSearcher extends IndexSearcherBase implements IndexSearcher {
 	
-	public final static int NUM_RESULTS = 10000;
-	
 	private Client client = null;
 	private final String index;
 	
@@ -79,7 +77,7 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 //    	srb.addField(EARQ.fDataType);
 //    	srb.addField(EARQ.fLang);
     	srb.setFrom(0);
-    	srb.setSize(NUM_RESULTS);
+    	srb.setSize(ElasticSearchConstants.NUM_RESULTS);
     	srb.setExplain(false);
     	SearchResponse response = srb.execute().actionGet();
     	SearchHits sh = response.getHits();
