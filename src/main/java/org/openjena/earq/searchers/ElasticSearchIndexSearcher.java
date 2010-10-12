@@ -53,8 +53,8 @@ public class ElasticSearchIndexSearcher extends IndexSearcherBase implements Ind
 			.local(ElasticSearchConstants.LOCAL)
 			.settings(
 				ImmutableSettings.settingsBuilder()
-    				.put("network.host", "127.0.0.1")
-//					.put("index.store.type", "memory")
+//    				.put("network.host", "127.0.0.1")
+					.put("index.store.type", "memory")
 					.put("gateway.type", "none")
 					.put("index.number_of_shards", 1)
 					.put("index.number_of_replicas", 1).build()

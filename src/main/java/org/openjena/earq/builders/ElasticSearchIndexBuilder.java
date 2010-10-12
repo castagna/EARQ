@@ -53,7 +53,7 @@ public class ElasticSearchIndexBuilder extends IndexBuilderBase {
     		.local(ElasticSearchConstants.LOCAL)
     		.settings(
     			ImmutableSettings.settingsBuilder()
-        			.put("network.host", "127.0.0.1")
+//        			.put("network.host", "127.0.0.1")
 //    				.put("index.store.type", "memory")
     				.put("gateway.type", "none")
     				.put("index.number_of_shards", 1)
