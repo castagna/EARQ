@@ -44,3 +44,4 @@ Todo
 ----
 
  * ... still broken
+ * Remove LARQ reference from ModelIndexerSubject
