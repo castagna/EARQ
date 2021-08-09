@@ -32,7 +32,7 @@
   <properties>
     <arq.version>2.8.5</arq.version>
     <tdb.version>0.8.7</tdb.version>
-    <elasticsearch.version>0.11.0</elasticsearch.version>
+    <elasticsearch.version>6.8.17</elasticsearch.version>
     <jdk.version>1.6</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
